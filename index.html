@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gelataria Divino · Monte o seu gelato</title>
+<meta name="description" content="Gelato italiano feito todo dia na Matola. Monte o seu gelato arrastando os sabores.">
+<link rel="icon" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo" viewBox="0 0 270 100">
+    <text x="0" y="66" font-size="66" font-weight="800" fill="#14B5B0" font-family="'Baloo 2','Arial Rounded MT Bold',sans-serif">di</text>
+    <g transform="translate(80 4)"><circle cx="30" cy="14" r="13" fill="#FF6FA8"/><circle cx="18" cy="25" r="13" fill="#FFD23F"/><circle cx="42" cy="25" r="13" fill="#9AD65B"/><path d="M4 34h52L30 80z" fill="#14B5B0"/></g>
+    <text x="146" y="66" font-size="66" font-weight="800" fill="#14B5B0" font-family="'Baloo 2','Arial Rounded MT Bold',sans-serif">no</text>
+    <text x="148" y="92" font-size="17" font-weight="800" letter-spacing="4" fill="#14B5B0" font-family="'Nunito',sans-serif">GELATARIA</text>
+  </symbol>
+</svg>
+
+<div id="closed" class="closed" hidden>A loja está fechada de momento. Volte mais tarde para fazer o seu pedido.</div>
+
+<header class="top">
+  <a class="brand" href="#inicio" aria-label="Gelataria Divino"><svg viewBox="0 0 270 100"><use href="#logo"/></svg></a>
+  <nav>
+    <a href="#produtos">Produtos</a><a href="#monte">Monte o seu</a><a href="#cardapio">Cardápio</a><a href="#visitar">Visite-nos</a>
+    <a class="adm" href="admin/index.html">Área do restaurante</a>
+  </nav>
+</header>
+
+<main id="inicio">
+  <section class="hero">
+    <i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i>
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <h1>O seu gelato, <br>do seu jeito.</h1>
+        <p>Gelato italiano feito fresco todos os dias, no Parque dos Poetas, Matola. Escolha a base, arraste os sabores e veja a sua criação ganhar vida.</p>
+        <div class="ctas"><a class="cta" href="#monte">Montar o meu gelato</a><a class="ghost" href="#cardapio">Ver cardápio</a></div>
+      </div>
+      <figure class="hero-img">
+        <img src="assets/img/gelataria-hero.jpg" alt="Dois milkshakes com calda de chocolate dentro da Gelataria Divino">
+        <span class="sticker s1">Feito<br>hoje</span><span class="sticker s2">Gelato<br>italiano</span>
+      </figure>
+    </div>
+  </section>
+
+  <section id="produtos" class="prod">
+    <div class="wrap prod-grid">
+      <div class="prod-photo"><img src="assets/img/sundae-produto.jpg" alt="Sundae com gelato, calda e granulado de chocolate"></div>
+      <div class="prod-text">
+        <div class="drip" aria-hidden="true"></div>
+        <h2>Produtos Divino</h2>
+        <p>O Gelato Divino é o autêntico gelato ao estilo italiano: um produto premium tão cremoso que derrete na boca. É produzido fresco, todos os dias, na nossa própria unidade com certificação HACCP, e é isso que o faz o melhor. Temos de tudo: gelato e bolos, batidos e sundaes.</p>
+        <div class="tiles">
+          <a href="#cardapio" class="tile t-gelato"><b>Gelato</b><em>🍨</em></a>
+          <a href="#cardapio" class="tile t-cake"><b>Bolos</b><em>🍰</em></a>
+          <a href="#cardapio" class="tile t-shake"><b>Milkshake</b><em>🥤</em></a>
+          <a href="#cardapio" class="tile t-sundae"><b>Sundae</b><em>🍧</em></a>
+        </div>
+      </div>
+    </div>
+    <div class="wrap feedback">
+      <img src="assets/img/feedback-menina.jpg" alt="Menina de chapéu de palha a saborear um cone de gelato">
+      <blockquote><p>Derrete na boca e dá vontade de repetir! Cada bola é uma festa.</p><footer>Um cliente feliz da Divino</footer></blockquote>
+    </div>
+  </section>
+
+  <section id="monte" class="build">
+    <div class="wrap">
+      <h2>Monte o seu gelato</h2>
+      <p class="lead">Escolha a base, arraste os sabores para cima dela e solte. Cada bola custa até 150 MT, e pode juntar quantas quiser (até 5).</p>
+      <div class="bgrid">
+        <div class="panel">
+          <h3><span>1</span> Escolha a base</h3>
+          <div id="conts" class="conts"></div>
+          <h3><span>2</span> Arraste os sabores</h3>
+          <div id="flavors" class="flavors"></div>
+        </div>
+        <div class="right">
+          <div id="stage" class="stage">
+            <canvas id="gl" aria-label="Pré-visualização 3D do seu gelato"></canvas>
+            <div id="hint" class="hint">Solte aqui a base e os sabores</div>
+            <div id="shut" class="shut" hidden>Loja fechada</div>
+          </div>
+          <div class="sum">
+            <ul id="lines"></ul>
+            <div class="tot"><span>Total</span><b id="total">0 MT</b></div>
+            <div class="acts"><button id="undo" class="sm">Desfazer bola</button><button id="clear" class="sm">Limpar</button><button id="order" class="cta">Pedir agora</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cardapio" class="menu">
+    <div class="wrap">
+      <h2>Cardápio</h2>
+      <p class="lead">Preços em meticais (MT). O que estiver indisponível hoje aparece riscado.</p>
+      <div class="shakes"><img src="assets/img/gelataria-hero.jpg" alt="Milkshakes Divino"><img src="assets/img/sundae-produto.jpg" alt="Milkshake com gelato e granulado"></div>
+      <div id="menuGrid" class="menu-grid"></div>
+    </div>
+  </section>
+</main>
+
+<footer id="visitar" class="foot">
+  <div class="wrap">
+    <svg viewBox="0 0 270 100" class="flogo"><use href="#logo"/></svg>
+    <p>Matola · Parque dos Poetas<br>Instagram: @divino.gelataria</p>
+  </div>
+</footer>
+<div id="toast" class="toast" role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="js/store.js"></script>
+<script src="js/main.js"></script>
+<script src="js/builder.js"></script>
+</body>
+</html>
