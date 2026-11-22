@@ -1,6 +1,6 @@
 # Gelataria Divino
 
-Landing page + construtor 3D de gelato + painel admin.
+Landing page + construtor 3D de gelado + painel admin.
 
 ## Como abrir
 1. Descompacte a pasta.
@@ -18,3 +18,6 @@ Landing page + construtor 3D de gelato + painel admin.
 ## Para produção
 O localStorage serve para demonstração. Para o restaurante usar a sério, troque `DB.get()/DB.save()` em `js/store.js` por chamadas a uma API (Supabase, Firebase ou backend próprio) e proteja o admin com login real (o PIN atual é só no cliente).
 O texto do feedback (secção Produtos) é um exemplo: substitua por um depoimento real.
+
+## Dispositivos
+Testado em layouts de telemóvel (390px), tablet (820px) e desktop (1366px) sem rolagem horizontal. No telemóvel o painel de sabores fica ao lado do palco 3D; toque num sabor ou arraste-o. O admin usa barra de navegação inferior em ecrãs pequenos.

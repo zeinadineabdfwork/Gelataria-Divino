@@ -1,6 +1,6 @@
 /* Divino · painel do restaurante */
 (() => {
-  let db = DB.get(), tab = (location.hash || '#bi').slice(1), range = 14;
+  let db = DB.get(), tab = (location.hash || '#bi').slice(1), range = 14; const openCats = new Set([0, 1]);
   const $ = (s, r = document) => r.querySelector(s), mt = DB.mt, view = $('#view');
   const esc = s => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
   const save = () => DB.save(db);
@@ -25,7 +25,7 @@
   function insights(s) {
     const L = [], tot = Object.values(s.fc).reduce((a, b) => a + b.n, 0) || 1;
     const rank = db.flavors.map(f => ({ f, n: (s.fc[f.id] || {}).n || 0 })).sort((a, b) => b.n - a.n);
-    if (s.n) {
+    if (s.n && rank.length) {
       L.push(`🏆 <b>${rank[0].f.name}</b> lidera com ${Math.round(rank[0].n / tot * 100)}% das bolas vendidas.`);
       const h = s.hrs.indexOf(Math.max(...s.hrs)) + 8; L.push(`⏰ Horário de pico: <b>${h}h às ${h + 1}h</b>. Reforce a equipa e o stock antes disso.`);
       const bd = s.wd.indexOf(Math.max(...s.wd)); L.push(`📅 Melhor dia da semana: <b>${DAYS[bd]}</b> (${mt(s.wd[bd])} no período).`);
@@ -48,14 +48,14 @@
   function drawBars(cv, vals, labels) {
     const dpr = devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight; cv.width = w * dpr; cv.height = h * dpr; const x = cv.getContext('2d'); x.scale(dpr, dpr);
     const max = Math.max(...vals, 1), bw = w / vals.length;
-    vals.forEach((v, i) => { const bh = v / max * (h - 36); const g = x.createLinearGradient(0, h - 22 - bh, 0, h - 22); g.addColorStop(0, '#14B5B0'); g.addColorStop(1, '#5FE8C9'); x.fillStyle = g; x.beginPath(); x.roundRect(i * bw + 4, h - 22 - bh, bw - 8, bh, 8); x.fill(); x.fillStyle = '#3a1236'; x.font = '700 11px Nunito'; x.textAlign = 'center'; x.fillText(labels[i], i * bw + bw / 2, h - 6); if (v) x.fillText(v, i * bw + bw / 2, h - 28 - bh); });
+    vals.forEach((v, i) => { const bh = v / max * (h - 36); const g = x.createLinearGradient(0, h - 22 - bh, 0, h - 22); g.addColorStop(0, '#14B5B0'); g.addColorStop(1, '#5FE8C9'); x.fillStyle = g; x.beginPath(); (x.roundRect ? x.roundRect(i * bw + 4, h - 22 - bh, bw - 8, bh, 8) : x.rect(i * bw + 4, h - 22 - bh, bw - 8, bh)); x.fill(); x.fillStyle = '#3a1236'; x.font = '700 11px Nunito'; x.textAlign = 'center'; x.fillText(labels[i], i * bw + bw / 2, h - 6); if (v) x.fillText(v, i * bw + bw / 2, h - 28 - bh); });
   }
 
   /* ---------- views ---------- */
   const V = {};
   V.bi = () => {
     const s = stats(range), ch = s.prevRev ? Math.round((s.rev - s.prevRev) / s.prevRev * 100) : 0, tot = Object.values(s.cm).reduce((a, b) => a + b, 0) || 1;
-    const rank = db.flavors.map(f => ({ f, n: (s.fc[f.id] || {}).n || 0 })).sort((a, b) => b.n - a.n), mx = Math.max(1, rank[0].n);
+    const rank = db.flavors.map(f => ({ f, n: (s.fc[f.id] || {}).n || 0 })).sort((a, b) => b.n - a.n), mx = Math.max(1, ...rank.map(r => r.n));
     const cols = { copo: '#14B5B0', cone: '#FFB020', wafer: '#FF6FA8' }; let acc = 0;
     const conic = Object.keys(cols).map(k => { const a = acc / tot * 360; acc += s.cm[k]; return `${cols[k]} ${a}deg ${acc / tot * 360}deg`; }).join(',');
     return `<div class="head"><h2>Visão geral</h2><div class="seg">${[7, 14, 21].map(d => `<button data-do="range" data-v="${d}" class="${range === d ? 'on' : ''}">${d} dias</button>`).join('')}</div></div>
@@ -78,7 +78,7 @@
     <div class="glass card"><h3>Bases</h3>${Object.entries(db.containers).map(([k, c]) => `<div class="row mn"><b>${c.name}</b><label class="num">+<input type="number" min="0" max="100" step="5" data-a="ct" data-k="${k}" data-f="price" value="${c.price}">MT</label><label class="sw"><input type="checkbox" data-a="ct" data-k="${k}" data-f="on" ${c.on ? 'checked' : ''} aria-label="${c.name} disponível"><span></span></label><span></span></div>`).join('')}</div>
     <div class="glass card"><h3>Sabores (preço de 50 a 150 MT por bola)</h3>${db.flavors.map((f, i) => `<div class="row"><input type="color" data-a="fl" data-i="${i}" data-f="c" value="${f.c}" aria-label="Cor"><input data-a="fl" data-i="${i}" data-f="name" value="${esc(f.name)}" aria-label="Nome"><label class="num"><input type="number" min="50" max="150" step="5" data-a="fl" data-i="${i}" data-f="price" value="${f.price}">MT</label><label class="sw"><input type="checkbox" data-a="fl" data-i="${i}" data-f="on" ${f.on ? 'checked' : ''} aria-label="${esc(f.name)} disponível"><span></span></label><button class="btn dng" data-do="delfl" data-i="${i}" aria-label="Remover">✕</button></div>`).join('')}
     <div class="row" style="margin-top:.6rem"><input id="nfc" type="color" value="#FF6FA8"><input id="nfn" placeholder="Novo sabor"><label class="num"><input id="nfp" type="number" min="50" max="150" step="5" value="120">MT</label><span></span><button class="btn pri" data-do="addfl">+</button></div></div>`;
-  V.cardapio = () => `<div class="head"><h2>Cardápio</h2></div>${db.menu.map((c, ci) => `<div class="glass card"><details ${ci < 2 ? 'open' : ''}><summary>${c.title} (${c.items.length})</summary>${c.items.map((it, ii) => `<div class="row mn"><input data-a="mn" data-c="${ci}" data-i="${ii}" data-f="n" value="${esc(it.n)}"><label class="num"><input type="number" min="0" step="5" data-a="mn" data-c="${ci}" data-i="${ii}" data-f="p" value="${it.p}">MT</label><label class="sw"><input type="checkbox" data-a="mn" data-c="${ci}" data-i="${ii}" data-f="on" ${it.on ? 'checked' : ''} aria-label="Disponível"><span></span></label><button class="btn dng" data-do="delit" data-c="${ci}" data-i="${ii}" aria-label="Remover">✕</button></div>`).join('')}
+  V.cardapio = () => `<div class="head"><h2>Cardápio</h2></div>${db.menu.map((c, ci) => `<div class="glass card"><details data-c="${ci}" ${openCats.has(ci) ? 'open' : ''}><summary>${c.title} (${c.items.length})</summary>${c.items.map((it, ii) => `<div class="row mn"><input data-a="mn" data-c="${ci}" data-i="${ii}" data-f="n" value="${esc(it.n)}"><label class="num"><input type="number" min="0" step="5" data-a="mn" data-c="${ci}" data-i="${ii}" data-f="p" value="${it.p}">MT</label><label class="sw"><input type="checkbox" data-a="mn" data-c="${ci}" data-i="${ii}" data-f="on" ${it.on ? 'checked' : ''} aria-label="Disponível"><span></span></label><button class="btn dng" data-do="delit" data-c="${ci}" data-i="${ii}" aria-label="Remover">✕</button></div>`).join('')}
     <div class="row mn"><input id="ni${ci}" placeholder="Novo item"><label class="num"><input id="np${ci}" type="number" min="0" step="5" value="100">MT</label><span></span><button class="btn pri" data-do="addit" data-c="${ci}">+</button></div></details></div>`).join('')}`;
   V.pedidos = () => `<div class="head"><h2>Pedidos</h2><span>${db.orders.filter(o => o.status === 'novo').length} novos</span></div><div class="glass card" style="overflow:auto"><table><tr><th>Quando</th><th>Pedido</th><th>Total</th><th>Estado</th><th></th></tr>${db.orders.slice(0, 60).map(o => `<tr><td>${new Date(o.t).toLocaleString('pt-PT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}${o.demo ? ' <span class="tag demo">demo</span>' : ''}</td><td><b>${db.containers[o.cont] ? db.containers[o.cont].name : o.cont}</b>: ${o.items.map(i => esc(i.name)).join(', ')}</td><td>${mt(o.total)}</td><td><select data-a="or" data-id="${o.id}">${ST.map(s => `<option ${o.status === s ? 'selected' : ''}>${s}</option>`).join('')}</select></td><td><button class="btn dng" data-do="delor" data-id="${o.id}" aria-label="Apagar">✕</button></td></tr>`).join('')}</table></div>`;
   V.ajustes = () => `<div class="head"><h2>Ajustes</h2></div><div class="glass card" style="display:grid;gap:.8rem;max-width:520px"><label>PIN do painel<br><input data-a="set" data-f="pin" value="${esc(db.pin)}"></label><label>WhatsApp para receber pedidos (com indicativo, sem +)<br><input data-a="set" data-f="wa" value="${esc(db.wa)}"></label></div>
@@ -104,7 +104,9 @@
     if (a === 'mn') db.menu[t.dataset.c].items[t.dataset.i][t.dataset.f] = v;
     if (a === 'or') db.orders.find(o => o.id === +t.dataset.id).status = v;
     if (a === 'set') db[t.dataset.f] = v;
-    save(); render();
+    save();
+    if (t.type === 'number' && t.dataset.f === 'price' && a === 'fl') t.value = v;
+    if (t.type === 'checkbox' || t.tagName === 'SELECT') render();
   });
   document.addEventListener('click', e => {
     const b = e.target.closest('[data-do]'); if (!b) return; db = DB.get(); const d = b.dataset, act = d.do;
@@ -124,5 +126,6 @@
     if (e.target.id !== 'imp' || !e.target.files[0]) return;
     const r = new FileReader(); r.onload = () => { try { const d = JSON.parse(r.result); if (!d.flavors) throw 0; DB.save(d); render(); } catch (x) { alert('Ficheiro inválido.'); } }; r.readAsText(e.target.files[0]);
   });
+  view.addEventListener('toggle', e => { const c = e.target.dataset && e.target.dataset.c; if (c !== undefined) e.target.open ? openCats.add(+c) : openCats.delete(+c); }, true);
   render();
 })();

@@ -1,4 +1,4 @@
-/* Divino · construtor de gelato: drag & drop + three.js */
+/* Divino · construtor de gelado: drag & drop + three.js */
 (() => {
   const MAX = 5, GAP = 1.45, ICON = { copo: '🥤', cone: '🍦', wafer: '🧇' };
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -10,7 +10,7 @@
 
   /* ---------- cena ---------- */
   const ren = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
-  ren.setPixelRatio(Math.min(devicePixelRatio, 2));
+  ren.setPixelRatio(Math.min(devicePixelRatio, innerWidth < 700 ? 1.5 : 2));
   const S = new THREE.Scene(), cam = new THREE.PerspectiveCamera(34, 1, .1, 100);
   S.add(new THREE.HemisphereLight(0xffffff, 0xffb6d5, .95));
   const key = new THREE.DirectionalLight(0xffffff, 1.1); key.position.set(4, 8, 6); S.add(key);
@@ -84,7 +84,7 @@
     const k = state.cont, base = k ? CONT[k].base : 1.8, n = state.scoops.length;
     state.scoops.forEach((s, i) => { s.y = base + i * GAP; if (snap && !s.fall) s.m.position.y = s.y; });
     const top = n ? base + (n - 1) * GAP + 1.2 : base + .6, asp = cam.aspect || 1;
-    tgt.look = top * .46; tgt.dist = Math.max(8.5, (top + 1.8) / .611 * 1.05, 4.6 / (.611 * asp));
+    tgt.look = top * .46; tgt.dist = Math.max(8.5, (top + 1.8) / .611 * 1.05, 4.2 / (.611 * asp));
     disc.visible = k === 'wafer' && n > 0; disc.position.set(.55, top - .35, .1); disc.rotation.z = -.55; disc.rotation.x = .3;
     if (snap) { cur.look = tgt.look; cur.dist = tgt.dist; }
   }
@@ -169,6 +169,7 @@
       const up = ev => {
         removeEventListener('pointermove', mv); removeEventListener('pointerup', up); removeEventListener('pointercancel', up);
         if (g) g.remove(); el.classList.remove('lift'); stage.classList.remove('over');
+        if (ev.type === 'pointercancel') return; // rolagem da lista no toque: não adiciona nada
         if (!moved) { const r = stage.getBoundingClientRect(); return drop(kind, id, r.left + r.width / 2, r.top + r.height / 3); }
         if (ev.type === 'pointerup' && inStage(ev)) drop(kind, id, ev.clientX, ev.clientY);
       };
@@ -192,7 +193,7 @@
     db = DB.get(); const c = state.cont;
     if (!db.open) return toast('A loja está fechada de momento.');
     if (!c || !state.scoops.length) return toast('Escolha uma base e pelo menos uma bola.');
-    if (!db.containers[c].on || state.scoops.some(s => !(fl(s.f.id) || {}).on)) return toast('Algum item ficou indisponível. Ajuste o seu gelato.');
+    if (!db.containers[c].on || state.scoops.some(s => !(fl(s.f.id) || {}).on)) return toast('Algum item ficou indisponível. Ajuste o seu gelado.');
     const items = state.scoops.map(s => ({ id: s.f.id, name: s.f.name, price: price(s) })), total = db.containers[c].price + items.reduce((a, b) => a + b.price, 0);
     db.orders.unshift({ id: Date.now(), t: Date.now(), cont: c, items, total, status: 'novo' }); DB.save(db);
     const txt = `Olá Divino! Quero um ${db.containers[c].name} com: ${items.map(i => i.name).join(', ')}. Total: ${DB.mt(total)}.`;
